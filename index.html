@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Entire Bee Movie Script</title>
+<style>
+:root{--honey:#ffc800;--amber:#ff9d00;--ink:#141005;--cream:#fff6d6;
+  --line:80px; /* how much scrolling counts as one "line" */
+  --hex:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+*{box-sizing:border-box}
+html,body{overflow-x:clip}
+body{margin:0;background:var(--ink);color:var(--cream);
+  font-family:"Arial Black","Segoe UI Black",Impact,system-ui,sans-serif}
+
+/* drifting honeycomb wallpaper */
+body::before{content:"";position:fixed;inset:0;z-index:-1;animation:drift 6s linear infinite;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23ffc800' stroke-opacity='.14' stroke-width='2'/%3E%3C/svg%3E")}
+@keyframes drift{to{background-position:56px 100px}}
+
+/* scroll progress, ridden by a bee */
+.prog{--p:0;position:fixed;inset:0 0 auto 0;height:10px;z-index:20;background:#000a}
+.prog b{display:block;height:100%;width:calc(var(--p)*100%);
+  background:repeating-linear-gradient(90deg,var(--honey) 0 14px,var(--amber) 14px 28px);animation:stripes .6s linear infinite}
+.prog i{position:absolute;top:-3px;left:calc(var(--p)*(100% - 26px));width:26px;font-size:22px;line-height:1;
+  font-style:normal;text-align:center;scale:-1 1;animation:hover .4s ease-in-out infinite alternate}
+@keyframes stripes{to{background-position:28px 0}}
+@keyframes hover{from{transform:translateY(-2px)}to{transform:translateY(3px)}}
+
+/* the swarm: positioned every frame by script */
+.bee{position:fixed;left:0;top:0;z-index:5;pointer-events:none;line-height:1;will-change:transform}
+
+/* shared keyframes */
+@keyframes wave{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-.22em) rotate(4deg) scale(1.1)}}
+@keyframes flash{0%,100%{color:#ffc800}20%{color:#ff8a00}40%{color:#ffe98a}60%{color:#ff6a00}80%{color:#ffb300}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes wobble{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes drip{from{transform:scaleY(.55)}to{transform:scaleY(1.2)}}
+
+.wave .w{display:inline-block;white-space:nowrap}
+.wave .w span{display:inline-block;animation:wave 1.2s ease-in-out infinite;animation-delay:calc(var(--i)*-.08s)}
+h1,h2{margin:0;text-transform:uppercase;color:var(--honey);line-height:1;text-shadow:0 .06em 0 #000,0 0 .5em #ffc80088}
+
+/* sunshine: spinning rays that fade out toward the edges of their section */
+.rays{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;
+  -webkit-mask-image:radial-gradient(ellipse closest-side,#000 8%,transparent 100%);
+          mask-image:radial-gradient(ellipse closest-side,#000 8%,transparent 100%)}
+.rays::before{content:"";position:absolute;left:50%;top:50%;width:200vmax;height:200vmax;margin:-100vmax;
+  background:repeating-conic-gradient(#ffc80030 0 10deg,transparent 10deg 20deg);animation:spin 24s linear infinite}
+
+/* ---------- pinned, scroll-driven scenes ----------
+   A .pin stays on screen for (--lines × --line) of scrolling.
+   Script sets --s (0 → 1) on each .scene as you scroll through its share. */
+.pin{position:relative;height:calc(var(--lines)*var(--line) + 100svh)}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden}
+.scene{position:absolute;inset:0;display:grid;place-items:center;isolation:isolate;--s:0}
+.scene i{display:block;font-style:normal}
+.fill{position:absolute;inset:0}
+
+/* hexagon tunnel */
+.tunnel .fill{animation:spin 40s linear infinite}
+.tunnel i{position:absolute;left:50%;top:50%;width:40vmin;height:46vmin;margin:-23vmin -20vmin;clip-path:var(--hex);
+  background:var(--honey);
+  transform:scale(calc(var(--k)*.22*(1 + var(--s)*5))) rotate(calc(var(--s)*90deg + var(--k)*6deg))}
+.tunnel i:nth-child(even){background:var(--ink)}
+.cue{position:absolute;bottom:8svh;font-size:3rem;opacity:calc(1 - var(--s)*6);animation:bounce .7s ease-in-out infinite}
+
+/* title slam */
+.title h1{position:relative;z-index:1;font-size:clamp(2.6rem,11vw,8rem);max-width:92vw;text-align:center;animation:wobble 2s ease-in-out infinite}
+.title h1 span{display:inline-block;--t:clamp(0,calc(var(--s)*7 - var(--j)),1);
+  opacity:var(--t);scale:calc(5 - 4*var(--t));rotate:calc((1 - var(--t))*-25deg)}
+
+/* swarm closing in on the honey */
+.swarm .fill{animation:spin 14s linear infinite}
+.swarm .fill i{position:absolute;left:50%;top:50%;font-size:clamp(24px,5vmin,48px);margin:-.6em;
+  transform:rotate(calc(var(--k)*15deg + var(--s)*360deg)) translateX(calc(90vmax - min(var(--s)*1.6,1)*(90vmax - 30vmin)))}
+
+/* one big bee leaving a trail */
+.flyby .big{position:absolute;left:0;top:50%;font-size:18vmin;line-height:1;margin-top:-9vmin;scale:-1 1;
+  translate:calc(var(--s)*130vw - 20vw) calc(sin(var(--s)*12)*18vh);animation:wobble .25s ease-in-out infinite}
+.flyby .fill i{position:absolute;width:14px;height:14px;margin:-7px;border-radius:50%;background:var(--honey);
+  --f:calc(var(--k)/30);left:calc(var(--f)*130vw - 20vw + 9vmin);top:calc(50% + sin(var(--f)*12)*18vh);
+  opacity:clamp(0,calc((var(--s) - var(--f))*40),1)}
+
+/* honey pouring down the screen */
+.honey{position:absolute;inset:0 0 auto 0;height:calc(var(--s)*135%);background:linear-gradient(var(--amber),var(--honey))}
+.honey i{position:absolute;top:calc(100% - 2px);left:calc(var(--k)*8.34%);width:8.4%;height:calc(var(--h)*1px);
+  border-radius:0 0 999px 999px;background:var(--honey);transform-origin:top;
+  animation:drip 1.4s ease-in-out infinite alternate;animation-delay:calc(var(--k)*-.37s)}
+
+/* stripes sweeping through */
+.stripes{display:grid;grid-template-rows:repeat(8,1fr);place-items:stretch;transform:rotate(-8deg) scale(1.5)}
+.stripes i{--dir:1;background:var(--honey);translate:calc((1 - var(--s)*2)*var(--dir)*110%) 0}
+.stripes i:nth-child(even){--dir:-1;background:#000}
+
+/* flower blooming */
+.flower .fill{animation:wobble 1.6s ease-in-out infinite}
+.flower .fill i{position:absolute;left:50%;top:50%;width:14vmin;height:40vmin;margin:-40vmin 0 0 -7vmin;border-radius:50%;
+  background:var(--cream);transform-origin:50% 100%;
+  transform:rotate(calc(var(--k)*30deg + var(--s)*120deg)) scaleY(min(var(--s)*2,1))}
+.eye{position:relative;width:24vmin;height:24vmin;border-radius:50%;background:radial-gradient(var(--amber),var(--honey));
+  scale:calc(min(var(--s)*2,1) + max(var(--s) - .75,0)*44)}
+
+/* honeycomb filling from the middle */
+.comb i{position:absolute;left:50%;top:50%;width:15vmin;height:17.3vmin;margin:-8.65vmin -7.5vmin;clip-path:var(--hex);
+  background:var(--honey);translate:calc(var(--x)*15.6vmin) calc(var(--y)*13.5vmin);
+  --t:clamp(0,calc(var(--s)*2.4 - var(--d)*1.2),1);scale:var(--t);rotate:calc((1 - var(--t))*180deg)}
+.comb i:nth-child(3n){background:var(--amber)}
+.comb i:nth-child(7n){background:#ffe98a}
+
+/* bee parade over a meadow */
+.parade .line i{position:absolute;left:0;top:45%;font-size:9vmin;scale:-1 1;--f:calc(var(--k)/12);
+  translate:calc((var(--s)*2.2 - var(--f))*100vw - 10vw) calc(sin(var(--s)*14 + var(--k)*.9)*10vh)}
+.parade .meadow i{position:absolute;bottom:8svh;left:calc(var(--k)*10% + 1%);font-size:8vmin;transform-origin:50% 100%;
+  scale:clamp(0,calc(var(--s)*4 - var(--k)*.2),1);animation:wobble 1s ease-in-out infinite;animation-delay:calc(var(--k)*-.13s)}
+
+/* ---------- framed pictures ----------
+   Each .pic shows pictures/<data-pic>.webp (or .jpg / .jpeg / .png / .gif) in a gold frame
+   ringed with hearts. Until that file exists it shows a bee instead. */
+.pic{--w:22vmin;position:relative;flex:none;width:var(--w);aspect-ratio:4/5;
+  border:calc(var(--w)*.07) solid #c98a00;border-image:linear-gradient(135deg,#fff3a3,#ffc800 28%,#a86a00 50%,#ffe45c 72%,#c98a00) 1;
+  background:radial-gradient(#ffe98a,#ffb300);box-shadow:0 .8vmin 0 #000,0 0 4vmin #ffc80077}
+.pic.mid{position:absolute;left:50%;top:50%;margin:calc(var(--w)*-.625) 0 0 calc(var(--w)/-2)}
+.pic img{display:block;width:100%;height:100%;object-fit:cover}
+.pic.empty::before{content:"🐝";position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--w)*.5);line-height:1}
+.pic svg{position:absolute;left:var(--x);top:var(--y);width:calc(var(--w)*var(--z));margin:calc(var(--w)*var(--z)*-.5);overflow:visible;
+  fill:var(--c);stroke:#8a5a00;stroke-width:1.5;rotate:var(--a);animation:beat 1.1s ease-in-out infinite;animation-delay:var(--dl)}
+@keyframes beat{0%,36%,100%{scale:1}12%{scale:1.3}24%{scale:1.05}}
+@keyframes swing{from{transform:rotate(-10deg)}to{transform:rotate(10deg)}}
+
+/* where the picture sits in each scene */
+.tunnel .pic{scale:calc(.35 + var(--s)*.9);animation:wobble 2s ease-in-out infinite}            /* grows out of the tunnel */
+.title .pic{position:absolute;left:50%;--w:18vmin;margin-left:calc(var(--w)/-2);animation:wobble 1.7s ease-in-out infinite}
+.title .pic.a{top:7svh;--t:clamp(0,calc(var(--s)*4),1);translate:-20vw calc((1 - var(--t))*-70vh);rotate:-8deg}   /* drops in above the title */
+.title .pic.b{bottom:7svh;--t:clamp(0,calc(var(--s)*4 - 1),1);translate:20vw calc((1 - var(--t))*70vh);rotate:8deg} /* rises in below it */
+.swarm .pic{scale:calc(var(--s)*1.3);animation:pulse .8s ease-in-out infinite}                   /* what the swarm gathers round */
+.flyby .pic{position:absolute;left:50%;top:calc(88% + 3vmin);--w:13vmin;margin-left:calc(var(--w)/-2);scale:-1 1;
+  transform-origin:50% -3vmin;animation:swing .9s ease-in-out infinite alternate}                 /* carried by the big bee */
+.flyby .pic::after{content:"";position:absolute;left:50%;top:calc(var(--w)*-.07 - 3vmin);width:2px;height:3vmin;background:var(--cream)}
+.pour .pic{position:absolute;left:50%;bottom:5vmin;--w:24vmin;margin-left:calc(var(--w)/-2);rotate:calc(sin(var(--s)*20)*8deg)} /* rides down in the honey */
+.stripes .pic{--w:16vmin;z-index:1;--t:clamp(0,calc(1.6 - max(var(--s)*2 - 1,1 - var(--s)*2)*2.4),1);
+  scale:var(--t);rotate:calc(8deg - (1 - var(--t))*180deg)}                                       /* spins in as the stripes meet */
+.flower .pic{--w:15vmin;scale:min(var(--s)*2,1);opacity:clamp(0,calc((.8 - var(--s))*10),1)}     /* the middle of the flower */
+.comb .pic{--w:26vmin;z-index:1;--t:clamp(0,calc(var(--s)*2.4 - .5),1);scale:var(--t);rotate:calc((1 - var(--t))*-90deg)} /* the centre cell */
+.parade .pic{--w:26vmin;top:42%;scale:clamp(0,calc(var(--s)*3),1);animation:wobble 1.4s ease-in-out infinite}  /* what the parade passes */
+.copy .pic{--w:20vmin;margin-bottom:28px;animation:wobble 1.6s ease-in-out infinite}
+.card{display:grid;justify-items:center}
+.gallery{display:flex;gap:5vmin;margin-top:5vmin}
+.gallery .pic{--w:18vmin;animation:wobble 1.3s ease-in-out infinite}
+.gallery .pic:nth-child(2){animation-delay:-.4s;translate:0 2vmin}
+.gallery .pic:nth-child(3){animation-delay:-.8s}
+
+/* the button */
+.copy{min-height:100svh;display:grid;place-content:center;justify-items:center;text-align:center;
+  padding:80px 16px;position:relative;isolation:isolate;overflow:hidden}
+.copy h2{font-size:clamp(2rem,8vw,5.5rem);margin-bottom:48px}
+#copyBtn{font:inherit;font-size:clamp(1.1rem,4.4vw,2.4rem);text-transform:uppercase;max-width:min(92vw,820px);
+  padding:.9em 1.3em;border:6px solid #000;border-radius:999px;color:#000;cursor:pointer;
+  background:linear-gradient(180deg,#ffe98a,var(--honey) 50%,var(--amber));
+  box-shadow:0 10px 0 #000;animation:throb 1.1s ease-in-out infinite,tilt 2.3s ease-in-out infinite,ring 1.1s ease-out infinite}
+#copyBtn:hover{animation-duration:.45s,.9s,.45s}
+#copyBtn:active{translate:0 8px;box-shadow:0 2px 0 #000}
+#copyBtn:focus-visible{outline:4px solid var(--cream);outline-offset:6px}
+#copyBtn.nope{animation:nope .5s}
+@keyframes throb{0%,100%{scale:1}50%{scale:1.08}}
+@keyframes tilt{0%,100%{rotate:-3deg}50%{rotate:3deg}}
+@keyframes ring{from{box-shadow:0 10px 0 #000,0 0 0 0 #ffc800cc}to{box-shadow:0 10px 0 #000,0 0 0 38px #ffc80000}}
+@keyframes nope{0%,100%{translate:0}20%,60%{translate:-16px}40%,80%{translate:16px}}
+#status{min-height:3em;margin:44px auto 0;max-width:34ch;font-size:clamp(.95rem,2.4vw,1.25rem)}
+
+/* the thank you: the last pinned scene, so it fades in over the outro */
+.scene.thanks{place-content:center;justify-items:center;text-align:center;padding:0 16px}
+.thanks h2{font-size:clamp(3.5rem,17vw,17rem);line-height:.92;animation:flash 1.5s linear infinite;
+  scale:calc(.5 + min(var(--s)*2,1)*.5)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}
+  .bee{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PUT THE SCRIPT HERE.
+     Replace the single placeholder line below with the full text.
+     Whatever sits between these two tags is what the button copies.
+     ============================================================ -->
+<script type="text/plain" id="bee-script">
+PASTE THE SCRIPT HERE
+</script>
+
+<div class="prog" aria-hidden="true"><b></b><i>🐝</i></div>
+<div class="bees" aria-hidden="true"></div>
+
+<!-- Intro: pinned for 100 lines of scrolling -->
+<header class="pin" style="--lines:100">
+  <div class="stage">
+    <div class="scene tunnel" data-bees="orbit" data-r="30" aria-hidden="true"><div class="fill"></div><div class="pic" data-pic="1"></div><div class="cue">👇</div></div>
+    <div class="scene title" data-bees="frame">
+      <div class="rays" aria-hidden="true"></div>
+      <div class="pic a" data-pic="2" aria-hidden="true"></div>
+      <div class="pic b" data-pic="3" aria-hidden="true"></div>
+      <h1 aria-label="The Entire Bee Movie Script">
+        <span style="--j:0">The</span> <span style="--j:1">Entire</span> <span style="--j:2">Bee</span>
+        <span style="--j:3">Movie</span> <span style="--j:4">Script</span>
+      </h1>
+    </div>
+    <div class="scene swarm" data-bees="away" aria-hidden="true"><div class="fill"></div><div class="pic" data-pic="4"></div></div>
+    <div class="scene flyby" data-bees="follow" data-around=".big" aria-hidden="true"><div class="fill"></div><div class="big">🐝<div class="pic" data-pic="5"></div></div></div>
+    <div class="scene pour" data-bees="flee" aria-hidden="true"><div class="honey"><div class="pic" data-pic="6"></div></div></div>
+    <div class="scene stripes" data-bees="away" aria-hidden="true"><div class="pic mid" data-pic="7"></div></div>
+    <div class="scene flower" data-bees="orbit" data-r="45" aria-hidden="true"><div class="fill"></div><div class="eye"></div><div class="pic mid" data-pic="8"></div></div>
+    <div class="scene comb" data-bees="frame" aria-hidden="true"><div class="pic mid" data-pic="9"></div></div>
+  </div>
+</header>
+
+<main>
+<section class="copy" data-bees="orbit" data-around="#copyBtn">
+  <div class="rays" aria-hidden="true"></div>
+  <div class="pic" data-pic="10" aria-hidden="true"></div>
+  <h2 class="wave">Here it is</h2>
+  <button id="copyBtn" type="button">🐝 <span id="btnLabel">Copy the entire Bee Movie script</span> 🐝</button>
+  <p id="status" role="status"></p>
+</section>
+
+<!-- Outro: three equal scenes. 20 lines of animation, then 10 more while the thank you fades in and holds. -->
+<div class="pin" style="--lines:30">
+  <div class="stage">
+    <div class="scene parade" data-bees="away" aria-hidden="true"><div class="pic mid" data-pic="11"></div><div class="fill line"></div><div class="fill meadow"></div></div>
+    <div class="scene tunnel" data-bees="orbit" data-r="34" data-fade=".2" aria-hidden="true"><div class="fill"></div><div class="pic" data-pic="12"></div></div>
+    <div class="scene thanks" data-bees="orbit" data-around=".card" data-fade=".5">
+      <div class="rays" aria-hidden="true"></div>
+      <div class="card">
+        <h2 class="wave">Thank you</h2>
+        <div class="gallery" aria-hidden="true">
+          <div class="pic" data-pic="13"></div><div class="pic" data-pic="14"></div><div class="pic" data-pic="15"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Split headings into individually waving letters (words stay unbroken).
+document.querySelectorAll('.wave').forEach(el => {
+  const text = el.textContent.trim();
+  el.setAttribute('aria-label', text);
+  el.textContent = '';
+  let i = 0;
+  text.split(/\s+/).forEach(word => {
+    const w = document.createElement('span');
+    w.className = 'w';
+    w.setAttribute('aria-hidden', 'true');
+    for (const ch of word) {
+      const s = document.createElement('span');
+      s.textContent = ch;
+      s.style.setProperty('--i', i++);
+      w.append(s);
+    }
+    el.append(w, ' ');
+  });
+});
+
+// The swarm. One lead bee always has somewhere to be, and the rest follow it nose to tail.
+// Each scene (and the copy section) says what the bees should do while it is showing, with data-bees:
+//   orbit   circle the middle of the screen at data-r (in vmin), or circle the element named by data-around
+//   frame   fly laps around the edge of the screen, leaving the middle clear
+//   follow  trail behind the element named by data-around
+//   flee    stay just below the pouring honey until it pushes them off the bottom
+//   away    leave the screen
+// If the mouse moved in the last few seconds the swarm circles the cursor instead,
+// except where it is circling a specific element (the button, the thank you).
+const GAP = 36, BEES = 16;
+const zones = [...document.querySelectorAll('[data-bees]')].map(el => ({
+  el, mode: el.dataset.bees, isScene: el.classList.contains('scene'), block: el.closest('.pin') || el,
+  around: el.dataset.around ? el.querySelector(el.dataset.around) : null, r: +el.dataset.r || 30
+}));
+let zone = null;
+function activeZone(h) {
+  let best = null, bestScore = 0;
+  for (const z of zones) {
+    const r = z.block.getBoundingClientRect();
+    if (r.top > h / 2 || r.bottom < h / 2) continue;          // its part of the page is not mid-screen
+    const score = z.isScene ? +z.el.style.opacity : 1;         // within a pin, the scene that is showing
+    if (score > bestScore) { best = z; bestScore = score; }
+  }
+  return best;
+}
+function destination(z, t, w, h) {
+  const cx = w / 2, cy = h / 2;
+  switch (z && z.mode) {
+    case 'orbit': {
+      let ox = cx, oy = cy, rx = z.r * Math.min(w, h) / 100, ry = rx;
+      if (z.around) {
+        const r = z.around.getBoundingClientRect();
+        ox = r.left + r.width / 2; oy = r.top + r.height / 2;
+        rx = r.width / 2 + 50; ry = r.height / 2 + 50;
+      }
+      rx = Math.min(rx, w / 2 - 24); ry = Math.min(ry, h / 2 - 24);
+      return [ox + Math.cos(t * 1.4) * rx, oy + Math.sin(t * 1.4) * ry];
+    }
+    case 'frame': {
+      const c = Math.cos(t * 0.8), s = Math.sin(t * 0.8);   // a squared-off loop that hugs the edges
+      return [cx + Math.sign(c) * Math.abs(c) ** 0.3 * (w / 2 - 36), cy + Math.sign(s) * Math.abs(s) ** 0.3 * (h / 2 - 44)];
+    }
+    case 'follow': {
+      const r = z.around.getBoundingClientRect();
+      return [r.left - 24, r.top + r.height / 2];
+    }
+    case 'flee':
+      return [cx + Math.sin(t * 1.2) * w * 0.35, z.el.style.getPropertyValue('--s') * 1.35 * h + 240];
+    default:
+      return [w + 700, h * 0.3];
+  }
+}
+const pointer = { x: 0, y: 0, at: -Infinity };
+addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') return;
+  pointer.x = e.clientX; pointer.y = e.clientY; pointer.at = performance.now();
+});
+if (!calm) {
+  const swarm = [];
+  for (let i = 0; i < BEES; i++) {
+    const el = document.createElement('div');
+    el.className = 'bee';
+    el.textContent = '🐝';
+    el.style.fontSize = `${40 - i * 1.2}px`;
+    $('.bees').append(el);
+    swarm.push({ el, x: -60 - i * GAP, y: innerHeight / 2, face: -1, tilt: 0 });
+  }
+  let last = performance.now();
+  requestAnimationFrame(function fly(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    const t = now / 1000, w = innerWidth, h = innerHeight;
+
+    // Where the lead bee is heading.
+    zone = activeZone(h) || zone;
+    const locked = zone && zone.mode === 'orbit' && zone.around;
+    let [tx, ty] = destination(zone, t, w, h);
+    if (!locked && now - pointer.at < 2500) {
+      tx = pointer.x + Math.cos(t * 4) * 50;
+      ty = pointer.y + Math.sin(t * 4) * 50;
+    }
+
+    swarm.forEach((bee, i) => {
+      const px = bee.x, py = bee.y;
+      if (i === 0) {
+        const ease = 1 - Math.exp(-dt * 4);
+        bee.x += (tx - bee.x) * ease;
+        bee.y += (ty - bee.y) * ease;
+      } else {
+        const ahead = swarm[i - 1];
+        const dx = ahead.x - bee.x, dy = ahead.y - bee.y, d = Math.hypot(dx, dy) || 1;
+        if (d > GAP) { bee.x = ahead.x - dx / d * GAP; bee.y = ahead.y - dy / d * GAP; }
+      }
+      // Face the way it is flying, and tilt into climbs and dives.
+      const vx = bee.x - px, vy = bee.y - py;
+      if (Math.abs(vx) > 0.2) bee.face = vx > 0 ? -1 : 1;
+      const want = Math.max(-35, Math.min(35, Math.atan2(vy, Math.abs(vx) + 0.001) * 57.3));
+      bee.tilt += (want - bee.tilt) * 0.15;
+      const bob = Math.sin(t * 9 + i * 0.8) * 4;
+      bee.el.style.transform =
+        `translate(${bee.x.toFixed(1)}px,${(bee.y + bob).toFixed(1)}px) translate(-50%,-50%) scaleX(${bee.face}) rotate(${(-bee.tilt).toFixed(1)}deg)`;
+    });
+    requestAnimationFrame(fly);
+  });
+}
+
+// Build the repeated pieces of each scene; every piece gets its index as --k.
+function make(selector, count, text = '', descending = false) {
+  document.querySelectorAll(selector).forEach(host => {
+    for (let n = 0; n < count; n++) {
+      const el = document.createElement('i');
+      el.style.setProperty('--k', descending ? count - n : n);
+      el.textContent = text;
+      host.append(el);
+    }
+  });
+}
+make('.tunnel .fill', 10, '', true);
+make('.swarm .fill', 24, '🐝');
+make('.flyby .fill', 30);
+make('.honey', 12);
+make('.stripes', 8);
+make('.flower .fill', 12);
+make('.parade .line', 12, '🐝');
+make('.parade .meadow', 10, '🌼');
+document.querySelectorAll('.honey i').forEach(d => d.style.setProperty('--h', Math.round(30 + Math.random() * 150)));
+for (let y = -8; y <= 8; y++) {
+  for (let x = -6; x <= 6; x++) {
+    const cell = document.createElement('i');
+    const ox = x + (y & 1 ? 0.5 : 0);
+    cell.style.cssText = `--x:${ox};--y:${y};--d:${(Math.hypot(ox, y * 0.87) / 9).toFixed(3)}`;
+    $('.comb').append(cell);
+  }
+}
+
+// Framed pictures. Each number is looked up once in the pictures folder, trying the common
+// file types in turn; a frame whose picture is missing shows a bee instead.
+const YELLOWS = ['#fff3a3', '#ffe45c', '#ffd21f', '#ffc800', '#f5b400', '#e6a100', '#ffdf80', '#ffb300'];
+const TYPES = ['webp', 'jpg', 'jpeg', 'png', 'gif'];
+const found = {};
+function findPicture(n) {
+  return found[n] ||= new Promise(resolve => {
+    let i = 0;
+    const probe = new Image();
+    probe.onload = () => resolve(probe.src);
+    probe.onerror = () => { if (++i < TYPES.length) probe.src = `pictures/${n}.${TYPES[i]}`; else resolve(null); };
+    probe.src = `pictures/${n}.${TYPES[0]}`;
+  });
+}
+document.querySelectorAll('.pic').forEach((pic, n) => {
+  findPicture(pic.dataset.pic).then(src => {
+    if (!src) return pic.classList.add('empty');
+    const img = new Image();
+    img.alt = '';
+    img.src = src;
+    pic.prepend(img);
+  });
+  // Sixteen hearts around the edge of the frame, each a different yellow, size and tilt.
+  let seed = n * 97 + 13;
+  const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+  for (let k = 0; k < 16; k++) {
+    const u = (k + rnd() * 0.6) / 4, along = (u % 1) * 100, off = rnd() * 8 - 3;
+    const [x, y] = [[along, -off], [100 + off, along], [100 - along, 100 + off], [-off, 100 - along]][Math.floor(u) % 4];
+    pic.insertAdjacentHTML('beforeend',
+      `<svg viewBox="-2 -2 36 34" aria-hidden="true" style="--x:${x.toFixed(1)}%;--y:${y.toFixed(1)}%;--z:${(0.14 + rnd() * 0.12).toFixed(2)};` +
+      `--c:${YELLOWS[Math.floor(rnd() * YELLOWS.length)]};--a:${Math.round(rnd() * 50 - 25)}deg;--dl:${(-rnd()).toFixed(2)}s">` +
+      `<path d="M16 29C-8 12 4-4 16 6 28-4 40 12 16 29z"/></svg>`);
+  }
+});
+
+// Drive the pinned scenes and the progress bar from the scroll position.
+const FADE = 0.08;
+const pins = [...document.querySelectorAll('.pin')].map(el => ({
+  el, stage: el.querySelector('.stage'), scenes: [...el.querySelectorAll('.scene')]
+}));
+const prog = $('.prog');
+const thanks = $('.scene.thanks');
+let queued = false;
+
+// The thank you keeps celebrating for as long as it is showing.
+let party = 0;
+function setParty(on) {
+  if (on === !!party) return;
+  clearInterval(party);
+  party = 0;
+  if (!on) return;
+  burst($('.thanks h2'), 50);
+  party = setInterval(() => burst($('.thanks h2'), 30), 1800);
+}
+
+function frame() {
+  queued = false;
+  const h = document.documentElement;
+  const done = h.scrollTop / ((h.scrollHeight - h.clientHeight) || 1);
+  prog.style.setProperty('--p', Math.min(1, Math.max(0, done)).toFixed(4));
+  for (const { el, stage, scenes } of pins) {
+    const r = el.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, -r.top / ((r.height - stage.offsetHeight) || 1)));
+    const n = scenes.length;
+    scenes.forEach((scene, i) => {
+      const s = Math.min(1, Math.max(0, p * n - i));
+      const fade = +scene.dataset.fade || FADE;
+      const fadeIn = i === 0 ? 1 : Math.min(1, s / fade);
+      const fadeOut = i === n - 1 ? 1 : Math.min(1, (1 - s) / fade);
+      const o = Math.min(fadeIn, fadeOut);
+      scene.style.setProperty('--s', s.toFixed(4));
+      scene.style.opacity = o;
+      scene.style.visibility = o > 0 ? 'visible' : 'hidden';
+    });
+  }
+  setParty(+thanks.style.opacity > 0.9);
+}
+function requestFrame() { if (!queued) { queued = true; requestAnimationFrame(frame); } }
+addEventListener('scroll', requestFrame, { passive: true });
+addEventListener('resize', requestFrame);
+frame();
+
+// Confetti, but bees.
+function burst(el, n = 70) {
+  if (calm) return;
+  const r = el.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span');
+    s.textContent = ['🐝', '🍯', '🌼', '✨', '💛'][i % 5];
+    s.style.cssText = `position:fixed;left:${cx}px;top:${cy}px;font-size:${16 + Math.random() * 28}px;pointer-events:none;z-index:30`;
+    document.body.append(s);
+    const a = Math.random() * Math.PI * 2;
+    const d = 120 + Math.random() * Math.max(innerWidth, innerHeight) * 0.5;
+    s.animate([
+      { transform: 'translate(-50%,-50%) scale(.2)', opacity: 1 },
+      { transform: `translate(calc(-50% + ${Math.cos(a) * d}px),calc(-50% + ${Math.sin(a) * d + 200}px)) rotate(${Math.random() * 720 - 360}deg) scale(1.2)`, opacity: 0 }
+    ], { duration: 1200 + Math.random() * 1200, easing: 'cubic-bezier(.1,.7,.3,1)' }).onfinish = () => s.remove();
+  }
+}
+
+// The copy button.
+const script = $('#bee-script').textContent.trim();
+const hasScript = script !== '' && !script.startsWith('PASTE THE SCRIPT HERE');
+const btn = $('#copyBtn'), label = $('#btnLabel'), status = $('#status');
+const idleLabel = label.textContent;
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try { return await navigator.clipboard.writeText(text); } catch {}
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;opacity:0';
+  document.body.append(ta);
+  ta.select();
+  const ok = document.execCommand('copy');
+  ta.remove();
+  if (!ok) throw new Error('copy failed');
+}
+
+btn.addEventListener('animationend', e => { if (e.animationName === 'nope') btn.classList.remove('nope'); });
+btn.addEventListener('click', async () => {
+  if (!hasScript) {
+    status.textContent = 'There is no script in here yet. Paste it into the marked block near the top of index.html.';
+    btn.classList.add('nope');
+    return;
+  }
+  try {
+    await copyText(script);
+    label.textContent = 'Copied!';
+    status.textContent = `${script.length.toLocaleString()} characters of bee are now on your clipboard.`;
+    burst(btn);
+    setTimeout(() => { label.textContent = idleLabel; }, 3000);
+  } catch {
+    status.textContent = 'Your browser blocked the clipboard. Click the button again.';
+  }
+});
+</script>
+</body>
+</html>
